@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
 <title>Reader · Draconia Malfoy and the Boy Who Said No</title>
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=e00ab8bf37">
 </head>
 <body class="reader">
 <nav class="bar">
@@ -19,7 +19,14 @@
 <footer class="foot">
   Unofficial fan reading index. Art © <a href="https://x.com/wanruochenhun" target="_blank" rel="noopener">@wanruochenhun</a> · Story © <span id="storycredit"><a href="https://x.com/nomoontwo_" target="_blank" rel="noopener">@nomoontwo_</a></span>. Images load directly from the original X posts; each page links to its source post. If you're the artist or an author and want this removed, ask <a href="https://x.com/RGuillimanXIII" target="_blank" rel="noopener">@RGuillimanXIII</a> and it will be taken down.
 </footer>
-<script src="assets/app.js"></script>
-<script>Draconia.reader();</script>
+<script src="comics.js?v=e00ab8bf37"></script>
+<script src="assets/app.js?v=e00ab8bf37"></script>
+<script>
+if (window.Draconia) { Draconia.reader(); } else {
+  var el = document.getElementById('series') || document.getElementById('pages');
+  if (el) el.innerHTML = '<div class="error"><h2>The page didn\'t load</h2><p>A script was blocked or failed to download.</p><p><a class="btn primary" href="' + location.pathname + '?_r=' + new Date().getTime() + '">Try again</a></p><p class="s">Opened from the X app? Tap the share icon and choose <b>Open in Safari</b>.</p></div>';
+}
+</script>
+<noscript><p class="error">This reader needs JavaScript. Open it in Safari or another browser.</p></noscript>
 </body>
 </html>

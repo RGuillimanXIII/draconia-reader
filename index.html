@@ -6,7 +6,7 @@
 <meta name="referrer" content="no-referrer">
 <title>Draconia Malfoy and the Boy Who Said No, plus Year 4 · @wanruochenhun comics in reading order</title>
 <meta name="description" content="Unofficial reading index for @wanruochenhun's Malfoid comic adaptations: Draconia Malfoy and the Boy Who Said No (by @nomoontwo_) and Year 4: Lyra Malfoy (by @DodgerWing), in story order.">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=e00ab8bf37">
 </head>
 <body>
 <header class="hero">
@@ -20,7 +20,14 @@
   This is an unofficial fan reading index. All artwork belongs to <a href="https://x.com/wanruochenhun" target="_blank" rel="noopener">@wanruochenhun</a>. The stories belong to their authors, <a href="https://x.com/nomoontwo_" target="_blank" rel="noopener">@nomoontwo_</a> (Draconia) and <a href="https://x.com/DodgerWing" target="_blank" rel="noopener">@DodgerWing</a> (Year 4). Images load directly from the original X posts and are not copied here. Every page links to its original post, so please like and repost there.
   If you're the artist or an author and want this page changed or taken down, just ask <a href="https://x.com/RGuillimanXIII" target="_blank" rel="noopener">@RGuillimanXIII</a> and it will be removed.
 </footer>
-<script src="assets/app.js"></script>
-<script>Draconia.index();</script>
+<script src="comics.js?v=e00ab8bf37"></script>
+<script src="assets/app.js?v=e00ab8bf37"></script>
+<script>
+if (window.Draconia) { Draconia.index(); } else {
+  var el = document.getElementById('series') || document.getElementById('pages');
+  if (el) el.innerHTML = '<div class="error"><h2>The page didn\'t load</h2><p>A script was blocked or failed to download.</p><p><a class="btn primary" href="' + location.pathname + '?_r=' + new Date().getTime() + '">Try again</a></p><p class="s">Opened from the X app? Tap the share icon and choose <b>Open in Safari</b>.</p></div>';
+}
+</script>
+<noscript><p class="error">This reader needs JavaScript. Open it in Safari or another browser.</p></noscript>
 </body>
 </html>
