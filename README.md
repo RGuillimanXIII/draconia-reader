@@ -1,43 +1,67 @@
-# Draconia reader
+# @wanruochenhun comics reader
 
-Unofficial fan reading index for **[@wanruochenhun](https://x.com/wanruochenhun)**'s comic adaptation of
-*Draconia Malfoy and the Boy Who Said No*, the fanfic by **[@nomoontwo_](https://x.com/nomoontwo_)**
-([Wattpad](https://www.wattpad.com/story/416789252-draconia-malfoy-and-the-boy-who-said-no)).
+Unofficial fan reading index for **[@wanruochenhun](https://x.com/wanruochenhun)**'s Malfoid comic adaptations. It has two separate series:
+
+1. **Draconia Malfoy and the Boy Who Said No**: the fanfic by **[@nomoontwo_](https://x.com/nomoontwo_)**
+   ([Wattpad](https://www.wattpad.com/story/416789252-draconia-malfoy-and-the-boy-who-said-no))
+2. **Year 4: Lyra Malfoy**: the Malfoid one-shot by **[@DodgerWing](https://x.com/DodgerWing)**
+   ([original post](https://x.com/DodgerWing/status/2108657501407433152))
 
 Live site: https://rguillimanxiii.github.io/draconia-reader/
 
-* `index.html`: chapter list in story order (following the Wattpad table of contents)
-* `read.html?ch=<key>`: one chapter, with prev/next and keyboard arrows (←/→ page, Shift+←/→ chapter)
-* `read.html?all=1`: every chapter in one scroll
+* `index.html`: one section per series, chapters in story order
+* `read.html?s=<series>&ch=<key>`: one chapter, with prev/next and keyboard arrows (←/→ page, Shift+←/→ chapter).
+  Leaving out `s` defaults to `draconia`, so older links still work.
+* `read.html?s=<series>&all=1`: a whole series in one scroll
 
 Images are **not** stored in this repo. They load straight from the artist's original X posts
-(`pbs.twimg.com`), and every page links back to its post. If the artist or author wants this taken down,
+(`pbs.twimg.com`), and every page links back to its post. If the artist or an author wants this taken down,
 it will be removed.
 
 ## Data
 
 Everything lives in `comics.json`:
 
-* `toc`: the story's chapter list (key, label, title, Wattpad link). It decides chapter order.
-* `chapters[].parts[]`: one entry per X post: `post_id`, `url`, `date`, `part` (roman numeral),
-  `pages`, `text`, `images[]` (`base`, `format`, `orig` = full-size `?name=orig` URL).
-* `excluded`: artist posts deliberately left out (e.g. a different story), so updates skip them.
-* `newest_post_id`: the newest included post. Use it as `since_id` when you fetch new posts.
+* `artist`: handle and numeric X id (`1596581433920745473`)
+* `series[]`: `id` (`draconia`, `lyra`), `title`, `short`, `story` credit, `parser`, `keywords`, `notes`, `toc`, `chapters`
+  * `toc`: chapter order (Draconia follows the Wattpad chapter list; Lyra is ordered by year number)
+  * `chapters[].parts[]`: one entry per X post: `post_id`, `url`, `date`, `part` (roman numeral), `pages`,
+    `conversation_id`, `text`, `images[]` (`base`, `format`, `orig` = full-size `?name=orig` URL)
+* `excluded`: artist posts deliberately left out, so updates skip them
+* `newest_post_id`: the newest post id seen. Use it as `since_id` when you fetch new posts.
+
+## How new posts are sorted (scripts/update.py)
+
+1. A post whose text contains one of a series' `keywords` goes to that series
+   (Draconia: the fic title; Lyra: `@DodgerWing`, `DodgerWing`, `Lyra Malfoy`).
+2. A post that replies to, quotes, or is in the same conversation as a post already on the site goes to that post's series.
+   This catches threaded continuation pages.
+3. A post with a `Chapter <n>, Part <roman> (Page a-b)` label goes to Draconia.
+
+Parsers:
+* `chapter_part` (Draconia) needs the label above.
+* `sequential` (Lyra)
+  * Chapter: `Year <n>` in the text, otherwise the chapter of the post it continues, otherwise the latest chapter.
+  * Parts are numbered I, II, III… in posting order.
+  * Pages come from `Page05-08`, `Page 9` or `first 4 pages`, otherwise they continue from the previous part.
+  * New years are added to `toc` automatically.
+
+Posts without photos are never added.
 
 ## Adding new posts
 
-1. Fetch the artist's posts newer than `newest_post_id` (user id `1596581433920745473`) with the X API v2
-   (`GET /2/users/1596581433920745473/tweets` or search `from:wanruochenhun Draconia`), using
-   `since_id=<newest_post_id>`, `expansions=attachments.media_keys`,
-   `media.fields=url,type,width,height,media_key`, `post.fields=created_at,attachments,referenced_tweets,conversation_id`.
+1. Fetch the artist's posts newer than `newest_post_id` with the X API v2, for example
+   `GET /2/users/1596581433920745473/tweets` with `since_id=<newest_post_id>`, `max_results=25`,
+   `expansions=attachments.media_keys`, `media.fields=url,type,width,height,media_key`,
+   `post.fields=created_at,author_id,attachments,referenced_tweets,conversation_id,note_tweet`.
    Save each raw JSON response to a file.
 2. `python3 scripts/update.py resp1.json [resp2.json ...]`
-   * Posts whose text has `Chapter <n>, Part <roman> (Page a-b)` are added and sorted automatically.
-   * Read the script output. It lists unknown chapter keys (add them to `toc`) and Draconia posts with images
-     but no label. Add those by hand with
-     `--manual <chapter> <part> <pages> <post_id>`, or add them to `excluded`.
+   * It prints what it added, chapter keys missing from `toc`, and posts to check by hand.
+     Add those with `--manual [SERIES:]CHAPTER PART PAGES POST_ID` (SERIES defaults to `draconia`),
+     e.g. `--manual 3 I 0-3 <id>` or `--manual lyra:year5 I 1-4 <id>`, or list them in `excluded`.
    * Re-running on the same posts is safe (known ids are skipped).
-3. Commit `comics.json` and push it to the branch GitHub Pages serves (see the bottom of this file). Pages redeploys on its own.
+   * Pass only files that hold @wanruochenhun's posts, or include `author_id` in `post.fields` so other authors are filtered out.
+3. Commit `comics.json` and push it to both branches (below).
 
 ## Branches / hosting
 
